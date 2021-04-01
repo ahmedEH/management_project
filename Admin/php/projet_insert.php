@@ -1,15 +1,33 @@
 <?php
 session_start();
 include("db_conn.php");
-
+$edit = false;
 if(!isset($_SESSION['user']))
 {
 header('location:php/login.php');
 }
-if(isset($_POST['client']))
+
+if(isset($_POST['edit_c_p']))
 {
-    $client = $_POST['client'];
-    $nom_client = $_POST['nom_client'];
+  $edit = true;
+  $projet = $_POST['projet'];
+  $client = $_POST['client'];
+  $nom_client = $_POST['nom_client'];
+  $_SESSION['client'] = $client;
+  $_SESSION['nom_client'] = $nom_client;
+  $req = "SELECT * from projets where id = '$projet'";
+  $row = mysqli_fetch_assoc(mysqli_query($db,$req));
+  $nom = $row['nom'];
+  $desc = $row['description'];
+
+}
+
+elseif(isset($_SESSION['client']))
+{
+    $client = $_SESSION['client'];
+    $nom_client = $_SESSION['nom_client'];
+    $nom = '';
+    $desc = '';
 }
 else
     header("location:../error.html");
@@ -32,12 +50,12 @@ else
 <body>
 
 <div class="jumbotron">
-  <h1 class="display-4">تسجيل المشاريع</h1>
-  <p class="lead">هنا يمكنك اضافة المشاريع و ربطها بالزبناء </p>
+  <h1 class="display-4"> تسجيل المشاريع و تعديلها</h1>
+  <p class="lead"> هنا يمكنك اضافة المشاريع و ربطها بالزبناء أو تعديلها </p>
   <hr class="my-4">
   <p>يمكنك ايضا الرجوع الى الصفحة الرئيسة اذا اردت</p>
   <p class="lead">
-    <a class="btn btn-primary btn-lg" href="../index.php" role="button">الصفحة الرئيسية</a>
+    <a class="btn btn-primary btn-lg" href="client.php" role="button">الرجوع الى  الزبون</a>
   </p>
 </div>
 <div class="container"style="margin-top:1%">
@@ -47,7 +65,7 @@ else
 
       <div class="form-outline mb-4">
       <label class="form-label" for="form6Example1">اسم المشروع</label>
-        <input required="required"type="text" id="form6Example1" name="nom"class="form-control" />
+        <input value = "<?php echo $nom;?>"required="required"type="text" id="form6Example1" name="nom"class="form-control" />
 
       </div>
 
@@ -55,10 +73,10 @@ else
       <label class="form-label" for="form6Example2">صاحب المشروع</label>
 <select required="required"id="form6Example2"name="client"class="form-control" aria-label="Default select example">
 <?php
-if(isset($_POST['client']) || isset($_POST['nom_client']))
+if(isset($client) || isset($nom_client))
 {
-  $id = $_POST['client'];
-  $nom = $_POST['nom_client'];
+  $id = $client;
+  $nom = $nom_client;
   $sql = "SELECT * from personnes where id = '$id'";
 $result = mysqli_query($db, $sql);
 $row = mysqli_fetch_assoc($result);
@@ -88,13 +106,24 @@ mysqli_close($db);
     <!-- Number input -->
     <div class="form-outline mb-4">
     <label class="form-label" for="form6Example6">وصف المشروع</label>
-    <textarea rows="5"name="desc"id="form6Example6" class="form-control" ></textarea>
+    <textarea rows="5"name="desc"id="form6Example6" class="form-control" ><?php echo $desc ;?></textarea>
 
   </div>
+<?php
 
+if(isset($_POST['projects']))
+  echo '<input type="text" name="projects"value="projects" hidden/>';
+  if($edit)
+{
+  echo "<input type=\"text\" value=\"$projet\" name = \"projet\"hidden/>";
+  echo   '<button type="submit" name="edit_c_p"class="btn btn-primary btn-block mb-4">حفظ التعديل</button>';
+}
 
-  <!-- Submit button -->
-  <button type="submit" name="en_project"class="btn btn-primary btn-block mb-4">حفظ</button>
+else {
+
+  echo '<button type="submit" name="en_project"class="btn btn-primary btn-block mb-4">حفظ</button>';
+}
+?>
 </form>
 
 </div>

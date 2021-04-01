@@ -2,23 +2,47 @@
 session_start();
 include('db_conn.php');
 
+$edit = false;
 
 if(!isset($_SESSION['user']))
 {
 header('location:php/login.php');
 }
 
-if(isset($_POST['fonction']))
+if(isset($_POST['edit_p']))
+{
+  $edit = true;
+  $person = $_POST['person'];
+  $req = "SELECT * from personnes where id = '$person'";
+  $row = mysqli_fetch_assoc(mysqli_query($db,$req));
+  $nom = $row['nom_prenom'];
+  $tel = $row['tel'];
+  $wtsp = $row['wtsp'];
+  $addresse = $row['adresse'];
+  
+}
+elseif(isset($_SESSION['fonction']))
+{
+  $nom = NULL;
+  $tel = NULL;
+  $wtsp = NULL;
+  $addresse = NULL;
 
-    $fonction = $_POST['fonction'];
-    if($fonction == "ouvrier")
-        $fonction = "عامل";
-    elseif($fonction == "client")
-        $fonction = "زبون";
-    elseif($fonction == "fournisseur")
-    $fonction = "مورد";
-    else
-        header("location:../index.php");
+
+
+}
+else
+  header("location:../error.html");
+
+  $fonction = $_SESSION['fonction'];
+  if($fonction == "ouvrier")
+      $fonction = "عامل";
+  elseif($fonction == "client")
+      $fonction = "زبون";
+  elseif($fonction == "fournisseur")
+      $fonction = "مورد";
+  else
+      header("location:../error.html");
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +77,7 @@ if(isset($_POST['fonction']))
 
 
       <div class="form-outline mb-4">
-        <input required="required"type="text" id="form6Example1" name="nom"class="form-control" />
+        <input value = "<?php echo $nom ;?>"required="required"type="text" id="form6Example1" name="nom"class="form-control" />
         <label class="form-label" for="form6Example1">الاسم الكامل</label>
       </div>
 
@@ -62,18 +86,18 @@ if(isset($_POST['fonction']))
 
     <!-- Number input -->
     <div class="form-outline mb-4">
-    <input type="number" name="tel"id="form6Example6" class="form-control" />
+    <input value = "<?php echo $tel ;?>"type="number" name="tel"id="form6Example6" class="form-control" />
     <label class="form-label" for="form6Example6">الهاتف النقال</label>
   </div>
 
     <!-- Number input -->
     <div class="form-outline mb-4">
-    <input type="number" name="wtsp"id="form6Example6" class="form-control" />
+    <input value = "<?php echo $wtsp ;?>" type="number" name="wtsp"id="form6Example6" class="form-control" />
     <label class="form-label" for="form6Example6">الواتساب</label>
   </div>
   <!-- Text input -->
   <div class="form-outline mb-4">
-    <input type="text" name="add"id="form6Example3" class="form-control" />
+    <input value = "<?php echo $addresse ;?>"type="text" name="add"id="form6Example3" class="form-control" />
     <label class="form-label" for="form6Example3">العنوان السكني</label>
   </div>
 
@@ -88,9 +112,18 @@ if(isset($_POST['fonction']))
 
 
 
-
-  <!-- Submit button -->
-  <button type="submit" name="en"class="btn btn-primary btn-block mb-4">حفظ</button>
+<?php
+if($edit)
+{
+  echo "<input type = \"text\" value = \"$person\" name = \"person\" hidden />";
+  echo '<button type="submit" name="edit_p"class="btn btn-primary btn-block mb-4">حفظ التعديل</button>';
+}
+else
+{
+  echo '<button type="submit" name="en"class="btn btn-primary btn-block mb-4">حفظ</button>';
+}
+?>
+  
 </form>
 
 </div>

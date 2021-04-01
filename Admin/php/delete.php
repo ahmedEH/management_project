@@ -12,7 +12,7 @@ if(isset($_GET['client_compte']))
     $in = $_GET['client_compte'];
     $req = "delete from client_compte where id = '$in'";
     mysqli_query($db,$req);
-    header('location:../index.php');
+    header('location:client.php');
 
 
 }
@@ -21,14 +21,14 @@ elseif(isset($_GET['projet']))
     $in = $_GET['projet'];
     $req = "delete from projets where id = '$in'";
     mysqli_query($db,$req);
-    header('location:./projects.php');
+    header('location:./client.php');
 }
 elseif(isset($_GET['depense']))
 {
     $in = $_GET['depense'];
     $req = "delete from depenses where id = '$in'";
     mysqli_query($db,$req);
-    header('location:../index.php');
+    header('location:project.php');
 
 
 }
@@ -37,7 +37,7 @@ elseif(isset($_GET['ouvrier']))
     $in = $_GET['ouvrier'];
     $req = "delete from ouvriers_projets where id = '$in'";
     mysqli_query($db,$req);
-    header('location:../index.php');
+    header('location:project.php');
 
 
 }
@@ -46,7 +46,7 @@ elseif(isset($_GET['client']))
     $in = $_GET['client'];
     $req = "delete from personnes where id = '$in'";
     mysqli_query($db,$req);
-    header('location:./clients.php');
+    header("location:clients.php");
 }
 elseif(isset($_GET['work']))
 {

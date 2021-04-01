@@ -6,18 +6,26 @@ include('db_conn.php');
 
 if(!isset($_SESSION['user']))
 {
-header('location:php/login.php');
+  header('location:../error.html');
 }
 if(isset($_POST['client']))
 {
     $client = $_POST['client'];
-    $sql = "select * from personnes where id = '$client'";
-    $resu = mysqli_query($db,$sql);
-    $ro = mysqli_fetch_assoc($resu);
-    $nom_client = $ro['nom_prenom'];
-}else{
+
+}
+elseif(isset($_SESSION['client']))
+{
+    $client = $_SESSION['client'];
+
+}
+
+else{
     header('location:../error.html');
 }
+$sql = "select * from personnes where id = '$client'";
+$resu = mysqli_query($db,$sql);
+$ro = mysqli_fetch_assoc($resu);
+$nom_client = $ro['nom_prenom'];
 ?>
 
 
@@ -103,6 +111,10 @@ button.url:hover {
   box-sizing: border-box;
 }
 
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
 #myInput {
   background-image: url('/css/searchicon.png');
   background-position: 10px 10px;
@@ -169,15 +181,15 @@ button.url:hover {
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 
   <a class="" href="../index.php" role="button">الصفحة الرئيسية</a>
-  <form action="client_in_form.php"method="post">
+  <form action="person_insert_inter.php"method="post">
   <input type="text" name="client"value="<?php echo $client;?>"hidden/>
   <input type="text" name="nom_client"value="<?php echo $nom_client;?>"hidden/>
-  <button class="url"> اضافة مدخول</button>
+  <button class="url"name = "btn_in"> اضافة مدخول</button>
   </form>
-  <form action="projet_insert.php"method="post">
+  <form action="person_insert_inter.php"method="post">
   <input type="text" name="client"value="<?php echo $client;?>"hidden/>
   <input type="text" name="nom_client"value="<?php echo $nom_client;?>"hidden/>
-  <button class="url"> اضافة مشروع</button>
+  <button class="url" name = "btn_projet"> اضافة مشروع</button>
   </form>
 </div>
 
@@ -214,27 +226,29 @@ if(isset($_GET['e']))
 <br/><br/>
 
 <div class="container-fluid">
-<div class="card-deck">
+<div class="row">
 
-<div class="card bg-success text-white">
-    <div class="card-body">
+<div class="col mx-3 p-3 rounded my-3 bg-success text-white">
+
       <h2>مجموع المداخيل</h2>
-      <h1 style="float:left;"><span class="badge badge-primary">
+      <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
         <?php
         $req = "select sum(montant) from client_compte where client ='$client'";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $in = $res['sum(montant)'];
-        echo $in - 0;
+        $montant = $in - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
         ?>
-      </span></h1>
+      </span></h3>
 
-</div>
+
   </div>
 
-  <div class="card bg-danger text-white">
-    <div class="card-body">
+  <div class="col mx-3 p-3 rounded my-3 bg-danger text-white">
+
     <h2>مجموع المصاريف</h2>
-    <h1 style="float:left;"><span class="badge badge-primary">
+    <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
     <?php
         $req = "select sum(montant_unitaire * quantite) from depenses where projet in (select id from projets where client = '$client')";        ;
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
@@ -242,37 +256,43 @@ if(isset($_GET['e']))
         $req = "select sum(montant) from ouvriers_projets where projet in (select id from projets where client = '$client')";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $out_ouv = $res['sum(montant)'];
-        echo ($out + $out_ouv) - 0;
+
+        $montant = ($out + $out_ouv) - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
         ?>
-    </span></h1>
+    </span></h3>
 
-    </div>
+
   </div>
 
-  <div class="card bg-warning text-white">
-    <div class="card-body">
+  <div style = "overflow: cover;"class="col mx-3 p-3 rounded my-3 bg-warning text-white">
+
     <h2> الباقي</h2>
-    <h1 style="float:left;"><span class="badge badge-primary">
+    <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
       <?php
-      echo ($in - ($out + $out_ouv)) - 0;
-      ?>
-    </span></h1>
 
-    </div>
+      $montant = ($in - ($out + $out_ouv)) - 0;
+      $montant = number_format($montant, 2, ',', ' ');
+      echo $montant ;
+      ?>
+    </span></h3>
+
+
   </div>
-  <div class="card bg-light ">
-    <div class="card-body">
+  <div class="col mx-3 p-3 rounded my-3 bg-light ">
+
     <h4> المشاريع</h4>
-    <h1 style="float:left;"><span class="badge badge-primary">
+    <h3 style="float:left;"><span class="badge badge-primary">
     <?php
         $req = "select count(*) from projets where client = '$client'";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $out = $res['count(*)'];
         echo $out - 0;
         ?>
-    </span></h1>
+    </span></h3>
 
-    </div>
+
   </div>
 </div>
   
@@ -292,6 +312,7 @@ if(isset($_GET['e']))
     <th >تاريخ  </th>
     <th >  الوصف</th>
     <th >  الخيارات</th>
+
   </tr>
 <?php
 
@@ -302,17 +323,24 @@ if (mysqli_num_rows($result) > 0) {
     while($row = mysqli_fetch_assoc($result)) {
         $verseur = $row['verseur'];
         $montant = $row['montant'];
+        $montant = number_format($montant, 2, ',', ' ');
         $date = $row['date_v'];
         $desc = $row['description'];
         $id = $row['id'];
         echo '<tr>';
         echo '<td>'.$verseur.'</td>';
-        echo '<td>'.$montant.'</td>';
-        echo '<td>'.$date.'</td>';
+        echo '<td dir="ltr"><strong>'.$montant.'</strong></td>';
+        echo '<td dir="ltr">'.$date.'</td>';
         echo '<td>'.html_entity_decode($desc).'</td>';
-        echo "<td><form action=\"delete.php\"method=\"GET\">
+        echo "<td class = \"row\"><form class=\"col d-inline\"action=\"delete.php\"method=\"GET\">
         <input type=\"text\" name=\"client_compte\"value=\"$id\"hidden/>
-        <button type=\"submit\"class=\"btn btn-danger\">حذف</button>
+        <input class=\"btn btn-danger\" type=\"button\" onClick=\"confSubmit(this.form);\" value=\"حذف\">
+        </form>";
+        echo "<form class=\"col d-inline\"action=\"client_in_form.php\"method=\"POST\">
+        <input type=\"text\" name=\"in\"value=\"$id\"hidden/>
+        <input type=\"text\" name=\"client\"value=\"$client\"hidden/>
+        <input type=\"text\" name=\"nom_client\"value=\"$nom_client\"hidden/>
+        <input name=\"edit_c_i\"class=\"btn btn-warning\" type=\"submit\" value=\"تعديل\">
         </form></td>";
 
         echo '</tr>';
@@ -337,7 +365,9 @@ if (mysqli_num_rows($result) > 0) {
     <th >تاريخ التسجيل </th>
     <th > الوصف</th>
     <th > الخيارات</th>
-    <th > </th>
+
+
+    
   </tr>
 <?php
 
@@ -352,17 +382,30 @@ if ($result) {
         $projet = $row['id'];
         echo '<tr>';
         echo '<td>'.$nom.'</td>';
-        echo '<td>'.$date.'</td>';
+        echo '<td dir="ltr">'.$date.'</td>';
         echo '<td>'.$desc.'</td>';
-        echo "<td><form action=\"project.php\"method=\"post\">
+        echo "<td class=\" p-0 container-fluid\"><form class=\"col d-inline  \"action=\"delete.php\"method=\"GET\">
         <input type=\"text\" name=\"projet\"value=\"$projet\"hidden/>
         <input type=\"text\" name=\"client\"value=\"$client\"hidden/>
-        <button class=\"btn btn-primary\">زيارة</button>
-        </form></td>";
-        echo "<td><form action=\"delete.php\"method=\"GET\">
+        <input  class=\"my-1 btn btn-danger\" type=\"button\" onClick=\"confSubmit(this.form);\" value=\"حذف\">
+        </form>";
+
+        echo "<form class=\"col d-inline  \"action=\"projet_insert.php\"method=\"POST\">
         <input type=\"text\" name=\"projet\"value=\"$projet\"hidden/>
         <input type=\"text\" name=\"client\"value=\"$client\"hidden/>
-        <button type=\"submit\"class=\"btn btn-danger\">حذف</button>
+        <input type=\"text\" name=\"nom_client\"value=\"$nom_client\"hidden/>
+        <input name=\"edit_c_p\"class=\"btn btn-warning my-1\" type=\"submit\" value=\"تعديل\">
+        </form>";
+
+        echo "<form class=\"col d-inline  \"action=\"project.php\"method=\"post\">
+        <input type=\"text\" name=\"projet\"value=\"$projet\"hidden/>
+        <input type=\"text\" name=\"client\"value=\"$client\"hidden/>
+        <button class=\"my-1 btn btn-primary\">زيارة</button>
+        </form>";
+
+        echo "<form class=\"col d-inline  \"action=\"relevee_project.php\"method=\"POST\">
+        <input type=\"text\" name=\"projet\"value=\"$projet\"hidden/>
+        <input name=\"project_relevee\"class=\"btn btn-info my-1\" type=\"submit\" value=\"كشف\">
         </form></td>";
       
 
@@ -429,6 +472,15 @@ function closeNav() {
   document.getElementById("main").style.marginRight= "0";
 
 }
+
+
+function confSubmit(form) {
+if (confirm("هل انت متأكد من انك تريد الحذف؟")) {
+form.submit();
+}
+}
+
+
 </script>
 </body>
 </html>

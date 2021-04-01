@@ -4,7 +4,7 @@ include('db_conn.php');
 
 if(!isset($_SESSION['user']))
 {
-header('location:php/login.php');
+  header('location:../error.html');
 }
 ?>
 
@@ -106,6 +106,10 @@ body {
 #myTable tr.header, #myTable tr:hover {
   background-color: #f1f1f1;
 }
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
 </style>
 </head>
 <body>
@@ -130,6 +134,8 @@ body {
     <th > الواتساب الخاص به</th>
     <th >   الحي السكني</th>
     <th>خيارات</th>
+    <th> </th>
+    <th> </th>
   </tr>
 <?php
 $fonction = "مورد";
@@ -148,7 +154,19 @@ if (mysqli_num_rows($result) > 0) {
         echo '<td>'.$tel.'</td>';
         echo '<td>'.$wtsp.'</td>';
         echo '<td>'.$add.'</td>';
-        echo "<td><a href =\"./delete.php?four=$id_client\" class = \"btn btn-danger\">حذف</a></td>";
+        
+        echo "<td><form action=\"delete.php\"method=\"GET\">
+        <input type=\"text\" name=\"four\"value=\"$id_client\"hidden/>
+        <input  class=\"btn btn-danger\" type=\"button\" onClick=\"confSubmit(this.form);\" value=\"حذف\">
+        </form></td>";
+        echo "<td><form action=\"person_insert.php\"method=\"POST\">
+        <input type=\"text\" name=\"person\"value=\"$id_client\"hidden/>
+        <input name=\"edit_p\"class=\"btn btn-warning\" type=\"submit\" value=\"تعديل\">
+        </form></td>";
+        echo "<td><form action=\"relevee_fournisseur.php\"method=\"POST\">
+        <input type=\"text\" name=\"person\"value=\"$id_client\"hidden/>
+        <input name=\"fournisseur_relevee\"class=\"btn btn-info\" type=\"submit\" value=\"كشف\">
+        </form></td>";
 
 
         echo '</tr>';
@@ -156,7 +174,7 @@ if (mysqli_num_rows($result) > 0) {
     }
   }
 mysqli_close($db);
-
+$_SESSION['fonction'] = "fournisseur";
 ?>
 </table>
 </div>
@@ -190,6 +208,11 @@ function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
   document.getElementById("main").style.marginRight= "0";
 
+}
+function confSubmit(form) {
+if (confirm("هل انت متأكد من انك تريد الحذف؟")) {
+form.submit();
+}
 }
 </script>
 </body>

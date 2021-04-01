@@ -4,7 +4,7 @@ include('db_conn.php');
 
 if(!isset($_SESSION['user']))
 {
-header('location:php/login.php');
+  header('location:../error.html');
 }
 ?>
 
@@ -22,6 +22,8 @@ header('location:php/login.php');
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <link href="../css/style.css"rel="stylesheet" type="text/css">
+  <script src="../../conf/dist/jquery-confirm.min.js"></script>
+  <link href="../../conf/dist/jquery-confirm.min.css"rel="stylesheet" type="text/css">
   <style>
 body {
   font-family: "Lato", sans-serif;
@@ -106,6 +108,10 @@ body {
 #myTable tr.header, #myTable tr:hover {
   background-color: #f1f1f1;
 }
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
 </style>
 </head>
 <body>
@@ -131,6 +137,8 @@ body {
     <th >   الحي السكني</th>
     <th >خيارات</th>
     <th></th>
+    <th> </th>
+    <th> </th>
   </tr>
 <?php
 $fonction = "زبون";
@@ -151,15 +159,28 @@ if (mysqli_num_rows($result) > 0) {
         echo '<td>'.$add.'</td>';
         echo "<td> <form action=\"client.php\"method=\"post\">
         <input type=\"text\" name=\"client\"value=\"$id_client\"hidden/>
-        <button class=\"btn btn-primary\"> زيارة</button></td>";
-        echo "<td></form></div><div class=\"col\"><a href =\"./delete.php?client=$id_client\" class = \"btn btn-danger\">حذف</a></td>";
+        <button class=\"btn btn-primary\"> زيارة</button></form></td>";
+
+        echo "<td>
+                  <a href=\"delete.php?client=$id_client\" onclick = \"if (! confirm('هل انت متأكد من انك تريد الحذف ؟')) { return false; }\" class = \"btn btn-danger\">حذف</a>
+
+              </td>";
+        echo "<td><form action=\"person_insert.php\"method=\"POST\">
+        <input type=\"text\" name=\"person\"value=\"$id_client\"hidden/>
+        <input name=\"edit_p\"class=\"btn btn-warning\" type=\"submit\" value=\"تعديل\">
+        </form></td>";
+        echo "<td><form action=\"relevee_client.php\"method=\"POST\">
+        <input type=\"text\" name=\"person\"value=\"$id_client\"hidden/>
+        <input name=\"client_relevee\"class=\"btn btn-info\" type=\"submit\" value=\"كشف\">
+        </form></td>";
+
 
         echo '</tr>';
 
     }
   }
 mysqli_close($db);
-
+$_SESSION['fonction'] = "client";
 ?>
 </table>
 </div>
@@ -194,6 +215,9 @@ function closeNav() {
   document.getElementById("main").style.marginRight= "0";
 
 }
+
+
+
 </script>
 </body>
 </html>

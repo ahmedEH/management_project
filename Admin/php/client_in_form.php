@@ -2,16 +2,35 @@
 session_start();
 include('db_conn.php');
 
-
+$edit = false ;
 if(!isset($_SESSION['user']))
 {
 header('location:php/login.php');
 }
 
-if(isset($_POST['client']))
+if(isset($_POST['edit_c_i']))
 {
-    $client = $_POST['client'];
-    $nom_client = $_POST['nom_client'];
+  $edit = true;
+  $in = $_POST['in'];
+  $client = $_POST['client'];
+  $nom_client = $_POST['nom_client'];
+  $_SESSION['client'] = $client;
+  $_SESSION['nom_client'] = $nom_client;
+  $req = "SELECT * from client_compte where id = '$in'";
+  $row = mysqli_fetch_assoc(mysqli_query($db,$req));
+  $montant = $row['montant'];
+  $verseur = $row['verseur'];
+  $desc = $row['description'];
+
+}
+
+elseif(isset($_SESSION['client']))
+{
+    $client = $_SESSION['client'];
+    $nom_client = $_SESSION['nom_client'];
+    $montant = '';
+    $verseur = '';
+    $desc = '';
 }
 else
     header("location:../error.html");
@@ -34,12 +53,12 @@ else
 <body>
 
 <div class="jumbotron">
-  <h1 class="display-4">تسجيل مدخول جديد لحساب الزبون</h1>
-  <p class="lead"> هنا يمكنكم اضافة مداخيل لحساب الزبون : <?php echo $nom_client; ?></p>
+  <h1 class="display-4">تسجيل مدخول جديد  لحساب الزبون او تعديله</h1>
+  <p class="lead">  هنا يمكنكم اضافة مداخيل لحساب الزبون : <?php echo $nom_client; ?> و تعديلها</p>
   <hr class="my-4">
   <p>يمكنك ايضا الرجوع الى الصفحة الرئيسة اذا اردت</p>
   <p class="lead">
-    <a class="btn btn-primary btn-lg" href="../index.php" role="button">الصفحة الرئيسية</a>
+    <a class="btn btn-primary btn-lg" href="client.php" role="button"> الرجوع الى الزبون</a>
   </p>
 </div>
 
@@ -54,13 +73,13 @@ else
 
     <!-- Number input -->
     <div class="form-outline mb-4">
-    <input required="required"type="number" name="montant"id="form6Example6" class="form-control" />
+    <input value = "<?php echo $montant ; ?>"required="required"type="number" name="montant"id="form6Example6" class="form-control" />
     <label class="form-label" for="form6Example6">المبلغ بالاوقية</label>
   </div>
 
     <!-- Number input -->
     <div class="form-outline mb-4">
-    <input required="required"type="text" name="verseur"id="form6Example6" class="form-control" />
+    <input value = "<?php echo $verseur ; ?>"required="required"type="text" name="verseur"id="form6Example6" class="form-control" />
     <label class="form-label" for="form6Example6">المدخل</label>
   </div>
 
@@ -68,17 +87,24 @@ else
   <!-- Text input -->
   <div class="form-outline mb-4">
     <label class="form-label" for="form6Example4">الوصف</label>
-    <textarea rows="5"name="desc"id="form6Example6" class="form-control" ></textarea>
+    <textarea rows="5"name="desc"id="form6Example6" class="form-control" ><?php echo $desc ; ?></textarea>
 
 </div>
 
 
 
+<?php
+if($edit)
+{
+  echo "<input type=\"text\" value=\"$in\" name = \"in\"hidden/>";
+  echo   '<button type="submit" name="edit_c_i"class="btn btn-primary btn-block mb-4">حفظ التعديل</button>';
+}
 
-
-
-  <!-- Submit button -->
-  <button type="submit" name="en_client_in"class="btn btn-primary btn-block mb-4">حفظ</button>
+else
+{
+  echo '<button type="submit" name="en_client_in"class="btn btn-primary btn-block mb-4">حفظ</button>';
+}
+?>
 </form>
 
 </div>

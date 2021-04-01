@@ -125,15 +125,15 @@ button.url:hover {
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 
   <a class="" href="../index.html" role="button">الصفحة الرئيسية</a>
-  <form class=" " action="php/person_insert.php"method="post">
+  <form class=" " action="php/person_insert_inter.php"method="post">
   <input type="text" name="fonction"value="ouvrier"hidden/>
   <button class="url">اضافة عامل</button>
   </form>
-  <form class=" " action="php/person_insert.php"method="post">
+  <form class=" " action="php/person_insert_inter.php"method="post">
   <input type="text" name="fonction"value="client"hidden/>
   <button class="url"> اضافة زبون</button>
   </form>
-  <form class=" " action="php/person_insert.php"method="post">
+  <form class=" " action="php/person_insert_inter.php"method="post">
   <input type="text" name="fonction"value="fournisseur"hidden/>
   <button class="url">اضافة مورد</button>
   </form>
@@ -172,27 +172,30 @@ button.url:hover {
  <br/><br/>
 
 <div class="container-fluid">
-<div class="card-deck">
+<div class="row">
 
-<div class="card bg-success text-white">
-    <div class="card-body">
+<div class="col p-3 mx-3 my-3 rounded bg-success text-white">
+
       <h2>مجموع المداخيل</h2>
-      <h1 style="float:left;"><span class="badge badge-primary">
+      <h3 style="float:left;"><span dir="ltr"class="badge badge-primary">
         <?php
         $req = "select sum(montant) from client_compte ";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $in = $res['sum(montant)'];
-        echo $in - 0;
-        ?>
-      </span></h1>
 
-</div>
+        $montant = $in - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
+        ?>
+      </span></h3>
+
+
   </div>
 
-  <div class="card bg-danger text-white">
-    <div class="card-body">
+  <div class="col p-3 mx-3 my-3 rounded bg-danger text-white">
+
     <h2>مجموع المصاريف</h2>
-    <h1 style="float:left;"><span class="badge badge-primary">
+    <h3 style="float:left;"><span dir="ltr"class="badge badge-primary">
     <?php
         $req = "select sum(montant_unitaire * quantite) from depenses ";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
@@ -200,23 +203,27 @@ button.url:hover {
         $req = "select sum(montant) from ouvriers_projets ";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $out_ouv = $res['sum(montant)'];
-        echo ($out + $out_ouv) - 0;
+        $montant = ($out + $out_ouv) - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
         ?>
-    </span></h1>
+    </span></h3>
 
-    </div>
+
   </div>
 
-  <div class="card bg-secondary text-white">
-    <div class="card-body">
-    <h2> الباقي</h2>
-    <h1 style="float:left;"><span class="badge badge-primary">
-      <?php
-      echo ($in - ($out + $out_ouv)) - 0;
-      ?>
-    </span></h1>
+  <div class="col p-3 mx-3 my-3 rounded bg-secondary text-white">
 
-    </div>
+    <h2> الباقي</h2>
+    <h3 style="float:left;"><span dir="ltr"class="badge badge-primary">
+      <?php
+      $montant = ($in - ($out + $out_ouv)) - 0;
+      $montant = number_format($montant, 2, ',', ' ');
+      echo $montant ;
+      ?>
+    </span></h3>
+
+
   </div>
 </div>
   
@@ -225,27 +232,27 @@ button.url:hover {
 <br/><br/>
 
 <div class="container-fluid">
-<div class="card-deck">
+<div class="row">
 
-<div class="card bg-light ">
-    <div class="card-body">
+<div class="col p-3 mx-3 my-3 rounded bg-light ">
+
       <h4> المشاريع</h4>
-      <h1 style="float:left;"><span class="badge badge-info">
+      <h3 style="float:left;"><span class="badge badge-info">
         <?php
         $req = "select count(*) from projets ";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $in = $res['count(*)'];
         echo $in - 0;
         ?>
-      </span></h1>
+      </span></h3>
 
-</div>
+
   </div>
 
-  <div class="card bg-light ">
-    <div class="card-body">
+  <div class="col p-3 mx-3 my-3 rounded bg-light ">
+
     <h4> الزبناء</h4>
-    <h1 style="float:left;"><span class="badge badge-info">
+    <h3 style="float:left;"><span class="badge badge-info">
     <?php
     $fonction = "زبون";
         $req = "select count(*) from personnes where fonction ='$fonction' ";
@@ -253,16 +260,16 @@ button.url:hover {
         $out = $res['count(*)'];
         echo $out - 0;
         ?>
-    </span></h1>
+    </span></h3>
 
-    </div>
+
   </div>
   
 
-  <div class="card bg-light ">
-    <div class="card-body">
+  <div class="col p-3 mx-3 my-3 rounded bg-light ">
+
     <h4> الموردين</h4>
-    <h1 style="float:left;"><span class="badge badge-info">
+    <h3 style="float:left;"><span class="badge badge-info">
       <?php
     $fonction = "مورد";
     $req = "select count(*) from personnes where fonction ='$fonction' ";
@@ -270,14 +277,14 @@ button.url:hover {
     $out = $res['count(*)'];
     echo $out - 0;
       ?>
-    </span></h1>
+    </span></h3>
 
-    </div>
+
   </div>
-  <div class="card bg-light ">
-    <div class="card-body">
+  <div class="col p-3 mx-3 my-3 rounded bg-light ">
+
     <h4> العمال</h4>
-    <h1 style="float:left;"><span class="badge badge-info">
+    <h3 style="float:left;"><span class="badge badge-info">
       <?php
     $fonction = "عامل";
     $req = "select count(*) from personnes where fonction ='$fonction' ";
@@ -285,9 +292,9 @@ button.url:hover {
     $out = $res['count(*)'];
     echo $out - 0;
       ?>
-    </span></h1>
+    </span></h3>
 
-    </div>
+
   </div>
 
 </div>

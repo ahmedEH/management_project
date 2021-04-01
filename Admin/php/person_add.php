@@ -21,7 +21,33 @@ if(isset($_POST['en']))
 VALUES ('$nom','$tel','$wtsp','$add','$fonction')";
 
 if (mysqli_query($db, $sql)) {
-  header("location:../index.php?e=1");
+  header("location:./person_insert.php");
+} else {
+  echo "Error: " . $sql . "<br>" . mysqli_error($db);
+}
+
+
+}
+elseif(isset($_POST['edit_p']))
+{
+    $nom = $_POST['nom'];
+    $tel = $_POST['tel'];
+    $wtsp = $_POST['wtsp'];
+    $add = $_POST['add'];
+    $person = $_POST['person'];
+    $sql = "UPDATE personnes 
+            SET nom_prenom = '$nom', tel = '$tel', wtsp = '$wtsp', adresse = '$add'
+            WHERE id = '$person'";
+
+if (mysqli_query($db, $sql)) {
+  if(isset($_SESSION['fonction']))
+  {
+    if($_SESSION['fonction'] == "ouvrier") header("location:workers.php");
+    if($_SESSION['fonction'] == "fournisseur") header("location:fournisseurs.php");
+    if($_SESSION['fonction'] == "clients") header("location:clients.php");
+  }
+  else 
+    header("location:../error.html");
 } else {
   echo "Error: " . $sql . "<br>" . mysqli_error($db);
 }

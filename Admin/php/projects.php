@@ -4,7 +4,7 @@ include('db_conn.php');
 
 if(!isset($_SESSION['user']))
 {
-header('location:php/login.php');
+  header('location:../error.html');
 }
 ?>
 
@@ -27,7 +27,10 @@ body {
   font-family: "Lato", sans-serif;
 
 }
-
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
 .sidenav {
   height: 100%;
   width: 0;
@@ -106,6 +109,10 @@ body {
 #myTable tr.header, #myTable tr:hover {
   background-color: #f1f1f1;
 }
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
 </style>
 </head>
 <body>
@@ -130,6 +137,8 @@ body {
     <th >وصف المشروع</th>
     <th >تاريخ تسجيل المشروع</th>
     <th >خيارات</th>
+    <th> </th>
+    <th> </th>
   </tr>
 <?php
 
@@ -144,18 +153,29 @@ if (mysqli_num_rows($result) > 0) {
         $result1  = mysqli_query($db, $sql1);
         if (mysqli_num_rows($result1) > 0)
           $row1 = mysqli_fetch_assoc($result1);
+          $nom_client = $row1['nom_prenom'];
 
       echo '<tr>';
       echo '<td>'.$row['nom'].'</td>';
       echo '<td>'.$row1['nom_prenom'].'</td>';
       echo '<td>'.$row['description'].'</td>';
-      echo '<td>'.html_entity_decode($row['date_debut']).'</td>';
+      echo '<td dir="ltr">'.html_entity_decode($row['date_debut']).'</td>';
       echo "<td>  <form action=\"project.php\"method=\"post\">
       <input type=\"text\" name=\"projet\"value=\"$id_project\"hidden/>
       <input type=\"text\" name=\"client\"value=\"$client\"hidden/>
       <button class=\"btn btn-primary\">زيارة</button>
       </form></td>";
-
+      echo "<td><form action=\"projet_insert.php\"method=\"POST\">
+      <input type=\"text\" name=\"projet\"value=\"$id_project\"hidden/>
+      <input type=\"text\" name=\"client\"value=\"$client\"hidden/>
+      <input type=\"text\" name=\"nom_client\"value=\"$nom_client\"hidden/>
+      <input type=\"text\" name=\"projects\"value=\"projects\"hidden/>
+      <input name=\"edit_c_p\"class=\"btn btn-warning\" type=\"submit\" value=\"تعديل\">
+      </form></td>";
+      echo "<td><form action=\"relevee_project.php\"method=\"POST\">
+      <input type=\"text\" name=\"projet\"value=\"$id_project\"hidden/>
+      <input name=\"project_relevee\"class=\"btn btn-info\" type=\"submit\" value=\"كشف\">
+      </form></td>";
       echo '</tr>';
 
     }

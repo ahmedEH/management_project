@@ -31,7 +31,7 @@ include("db_conn.php");
     $password = mysqli_real_escape_string($db,htmlspecialchars(md5($_POST['pass'])));
 
 
-    $requete = "SELECT count(*), nom, prenom FROM admins where 
+    $requete = "SELECT count(*), nom, prenom , tel FROM admins where 
     login = '".$username."' and passwd = '".$password."' ";
     $exec_requete = mysqli_query($db,$requete);
     $reponse      = mysqli_fetch_array($exec_requete);
@@ -39,6 +39,7 @@ include("db_conn.php");
     if($count!=0)
     { 
       $_SESSION['user'] = $reponse['nom']." ".$reponse['prenom'];
+      $_SESSION['user_tel'] = $reponse['tel'];
       header("location:../index.php");
     }
     else

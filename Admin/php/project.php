@@ -4,15 +4,31 @@ include('db_conn.php');
 
 if(!isset($_SESSION['user']))
 {
-header('location:php/login.php');
+header('location:../error.html');
 }
 if(isset($_POST['projet']))
 {
     $project = $_POST['projet'];
+    $_SESSION['projet'] = $project;
     $client = $_POST['client'];
-}else{
+    $_SESSION['client'] = $client;
+
+}
+elseif(isset($_SESSION['projet']))
+{
+    $project = $_SESSION['projet'];
+    $client = $_SESSION['client'];
+
+}
+else
+{
     header('location:../error.html');
 }
+
+$r = "SELECT * from projets where id = '$project'";
+$resu = mysqli_query($db,$r);
+$res = mysqli_fetch_assoc($resu);
+$nom_projet = $res['nom'];
 ?>
 
 
@@ -145,6 +161,10 @@ body {
 .div2{
     float:left;
 }
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
 </style>
 </head>
 <body>
@@ -153,8 +173,8 @@ body {
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 
   <a class="" href="../index.php" role="button">الصفحة الرئيسية</a>
-<a class="" href="getout_form.php?id=<?php echo $project;?>">اضافة مصروف</a>
-<a class=" " href="ouvrier_add.php?id=<?php echo $project;?>">اضافة عامل</a>
+<a class="" href="person_insert_inter.php?n=out">اضافة مصروف</a>
+<a class=" " href="person_insert_inter.php?n=ouv">اضافة عامل</a>
 
 
 </div>
@@ -177,6 +197,8 @@ if(isset($_GET['e']))
 <div class="jumbotron"style="padding:10px 40px 10px 10px;margin-bottom:0px">
   <h1 class="display-4"><?php echo $_SESSION['user'];?></h1>
   <p class="lead">هنا بامكانكم ادارة مشروع ما بعينه و ادارة المصاريف و المداخيل الخاصة به و العمال الذين يعملون به </p>
+  <p class="lead">اسم المشروع : <?php echo $nom_projet; ?> </p>
+
 </div>
 <!-- Image and text -->
 <nav class="navbar navbar-light bg-light">
@@ -192,48 +214,57 @@ if(isset($_GET['e']))
 <br/><br/>
 
 <div class="container-fluid">
-<div class="card-deck">
+<div class="row">
 
-<div class="card bg-success text-white">
-    <div class="card-body">
+<div class="col p-3 mx-3 my-3 rounded bg-success text-white">
+
       <h4>مجموع مصاريف الادوات</h4>
-      <h1 style="float:left;"><span class="badge badge-primary">
+      <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
         <?php
         $req = "select sum(montant_unitaire * quantite) from depenses where projet ='$project' ";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $out_tools = $res['sum(montant_unitaire * quantite)'];
-        echo $out_tools - 0;
-        ?>
-      </span></h1>
+        $montant = $out_tools - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
 
-</div>
+        ?>
+      </span></h3>
+
+
   </div>
 
-  <div class="card bg-danger text-white">
-    <div class="card-body">
+  <div class="col p-3 mx-3 my-3 rounded bg-danger text-white">
+
     <h4>مجموع مصاريف العمال</h4>
-    <h1 style="float:left;"><span class="badge badge-primary">
+    <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
     <?php
         $req = "select sum(montant) from ouvriers_projets where projet = '$project'";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $out_ouv = $res['sum(montant)'];
-        echo $out_ouv - 0;
-        ?>
-    </span></h1>
+        $montant = $out_ouv - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
 
-    </div>
+        ?>
+    </span></h3>
+
+
   </div>
 
-  <div class="card bg-secondary text-white">
-    <div class="card-body">
-    <h4> المجموع الكلي</h4>
-    <h1 style="float:left;"><span class="badge badge-primary">
-      <?php
-      echo ($out_tools + $out_ouv);
-      ?>
-    </span></h1>
+  <div class="col p-3 mx-3 my-3 rounded bg-secondary text-white">
 
-    </div>
+    <h4> المجموع الكلي</h4>
+    <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
+      <?php
+              $montant = ($out_tools + $out_ouv);
+              $montant = number_format($montant, 2, ',', ' ');
+              echo $montant ;
+
+      ?>
+    </span></h3>
+
+
   </div>
 </div>
   
@@ -241,27 +272,30 @@ if(isset($_GET['e']))
 <br/><br/>
 
 <div class="container-fluid">
-<div class="card-deck">
+<div class="row">
 
-<div class="card bg-light">
-    <div class="card-body">
+<div class="col p-3 mx-3 my-3 rounded bg-light">
+
       <h4>مجموع المداخيل</h4>
-      <h1 style="float:left;"><span class="badge badge-primary">
+      <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
         <?php
         $req = "select sum(montant) from client_compte where client ='$client'";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $in = $res['sum(montant)'];
-        echo $in - 0;
-        ?>
-      </span></h1>
+        $montant = $in - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
 
-</div>
+        ?>
+      </span></h3>
+
+
   </div>
 
-  <div class="card bg-light">
-    <div class="card-body">
+  <div class="col p-3 mx-3 my-3 rounded bg-light">
+
     <h4>مجموع المصاريف</h4>
-    <h1 style="float:left;"><span class="badge badge-primary">
+    <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
     <?php
         $req = "select sum(montant_unitaire * quantite) from depenses where projet in (select id from projets where client = '$client')";        ;
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
@@ -269,23 +303,28 @@ if(isset($_GET['e']))
         $req = "select sum(montant) from ouvriers_projets where projet in (select id from projets where client = '$client')";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $out_ouv = $res['sum(montant)'];
-        echo ($out + $out_ouv) - 0;
-        ?>
-    </span></h1>
+        $montant = ($out + $out_ouv) - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
 
-    </div>
+        ?>
+    </span></h3>
+
+
   </div>
 
-  <div class="card bg-light">
-    <div class="card-body">
-    <h4> الباقي</h4>
-    <h1 style="float:left;"><span class="badge badge-primary">
-      <?php
-      echo ($in - ($out + $out_ouv)) - 0;
-      ?>
-    </span></h1>
+  <div class="col p-3 mx-3 my-3 rounded bg-light">
 
-    </div>
+    <h4> الباقي</h4>
+    <h3 style="float:left;"><span dir ="ltr"class="badge badge-primary">
+      <?php
+      $montant = ($in - ($out + $out_ouv)) - 0;
+      $montant = number_format($montant, 2, ',', ' ');
+      echo $montant ;
+      ?>
+    </span></h3>
+
+
   </div>
 
 </div>
@@ -309,6 +348,7 @@ if(isset($_GET['e']))
     <th > تاريخ المصروف</th>
     <th >الوصف</th>
     <th> خيارات</th>
+
   </tr>
 <?php
 
@@ -320,6 +360,7 @@ if (mysqli_num_rows($result) > 0) {
         $nom = $row['nom'];
         $fournisseur = $row['fournisseur'];
         $montant = $row['montant_unitaire'];
+        $montant = number_format($montant, 2, ',', ' ');
         $quantite = $row['quantite'];
         $date = $row['date'];
         $desc = $row['description'];
@@ -333,14 +374,21 @@ if (mysqli_num_rows($result) > 0) {
       echo '<tr>';
       echo '<td>'.$nom.'</td>';
       echo '<td>'.$fournisseur.'</td>';
-      echo '<td>'.$montant.'</td>';
+      echo '<td dir="ltr"><strong>'.$montant.'</strong></td>';
       echo '<td>'.html_entity_decode($quantite).'</td>';
-      echo '<td>'.html_entity_decode($date).'</td>';
+      echo '<td dir="ltr">'.$date.'</td>';
       echo '<td>'.html_entity_decode($desc).'</td>';
-      echo "<td><form action=\"delete.php\"method=\"GET\">
+      echo "<td class=\"row\"><form class = \"col d-inline\"action=\"delete.php\"method=\"GET\">
       <input type=\"text\" name=\"depense\"value=\"$id_dep\"hidden/>
-      <button type=\"submit\"class=\"btn btn-danger\">حذف</button>
+      <input  class=\"my-1 btn btn-danger\" type=\"button\" onClick=\"confSubmit(this.form);\" value=\"حذف\">
+      </form>";
+      echo "<form class = \"col d-inline\"action=\"getout_form.php\"method=\"POST\">
+      <input type=\"text\" name=\"projet\"value=\"$project\"hidden/>
+      <input type=\"text\" name=\"out\"value=\"$id_dep\"hidden/>
+      <input name = \"edit_p_d\"class=\"my-1 btn btn-warning\" type=\"submit\" value=\"تعديل\">
       </form></td>";
+      echo '</tr>';
+      
       
 
       echo '</tr>';
@@ -364,6 +412,7 @@ if (mysqli_num_rows($result) > 0) {
     <th >  التاريخ</th>
     <th > الوصف</th>
     <th>خيارات</th>
+
   </tr>
 <?php
 
@@ -374,6 +423,7 @@ if ($result) {
     while($row = mysqli_fetch_assoc($result)) {
         $ouvrier = $row['ouvrier'];
         $montant = $row['montant'];
+        $montant = number_format($montant, 2, ',', ' ');
         $date = $row['date'];
         $desc = $row['description'];
         $id_ouvrier = $row['id'];
@@ -385,15 +435,19 @@ if ($result) {
 
       echo '<tr>';
       echo '<td>'.$ouvrier.'</td>';
-      echo '<td>'.$montant.'</td>';
-      echo '<td>'.$date.'</td>';
+      echo '<td dir="ltr"><strong>'.$montant.'</strong></td>';
+      echo '<td dir="ltr">'.$date.'</td>';
       echo '<td>'.html_entity_decode($desc).'</td>';
-      echo "<td><form action=\"delete.php\"method=\"GET\">
+      echo "<td class=\"row\"><form class = \"col d-inline\"action=\"delete.php\"method=\"GET\">
       <input type=\"text\" name=\"ouvrier\"value=\"$id_ouvrier\"hidden/>
-      <button type=\"submit\"class=\"btn btn-danger\">حذف</button>
-      </form></td>";
+      <input  class=\"my-1 btn btn-danger\" type=\"button\" onClick=\"confSubmit(this.form);\" value=\"حذف\">
+      </form>";
       
-
+      echo "<form class = \"col d-inline\"action=\"ouvrier_add.php\"method=\"POST\">
+      <input type=\"text\" name=\"projet\"value=\"$project\"hidden/>
+      <input type=\"text\" name=\"ouvrier\"value=\"$id_ouvrier\"hidden/>
+      <input name=\"edit_p_o\"class=\"my-1 btn btn-warning\" type=\"submit\" value=\"تعديل\">
+      </form></td>";
       echo '</tr>';
 
     }
@@ -454,6 +508,12 @@ function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
   document.getElementById("main").style.marginRight= "0";
 
+}
+
+function confSubmit(form) {
+if (confirm("هل انت متأكد من انك تريد الحذف؟")) {
+form.submit();
+}
 }
 </script>
 </body>
