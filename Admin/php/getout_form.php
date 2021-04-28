@@ -106,12 +106,12 @@ $project_name = $row['nom'];
           </select>
         </div>
         <div class="form-outline mb-4">
-          <label class="form-label" for="form6Example1">مبلغ الوحدة بالاوقية القديمة</label>
-          <input value = "<?php echo $montant_u ; ?>"type="number" id="form6Example1" name="montant"class="form-control" />
+          <label class="form-label" for="form6Example1">مبلغ الوحدة بالاوقية </label>
+          <input value = "<?php echo $montant_u ; ?>"type="number" step="0.01" id="form6Example1" name="montant"class="form-control" />
         </div>
         <div class="form-outline mb-4">
           <label class="form-label" for="form6Example1">الكمية</label>
-          <input value = "<?php echo $qt ; ?>"type="number" step="0.5"id="form6Example1" name="quantite"class="form-control" />
+          <input value = "<?php echo $qt ; ?>"type="number" step="0.01"id="form6Example1" name="quantite"class="form-control" />
         </div>
         <div class="form-outline mb-4">
           <label class="form-label" for="form6Example6">وصف العملية</label>

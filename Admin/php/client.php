@@ -334,13 +334,13 @@ if (mysqli_num_rows($result) > 0) {
         echo '<td>'.html_entity_decode($desc).'</td>';
         echo "<td class = \"row\"><form class=\"col d-inline\"action=\"delete.php\"method=\"GET\">
         <input type=\"text\" name=\"client_compte\"value=\"$id\"hidden/>
-        <input class=\"btn btn-danger\" type=\"button\" onClick=\"confSubmit(this.form);\" value=\"حذف\">
+        <input class=\"btn btn-danger my-1\" type=\"button\" onClick=\"confSubmit(this.form);\" value=\"حذف\">
         </form>";
         echo "<form class=\"col d-inline\"action=\"client_in_form.php\"method=\"POST\">
         <input type=\"text\" name=\"in\"value=\"$id\"hidden/>
         <input type=\"text\" name=\"client\"value=\"$client\"hidden/>
         <input type=\"text\" name=\"nom_client\"value=\"$nom_client\"hidden/>
-        <input name=\"edit_c_i\"class=\"btn btn-warning\" type=\"submit\" value=\"تعديل\">
+        <input name=\"edit_c_i\"class=\"btn btn-warning my-1\" type=\"submit\" value=\"تعديل\">
         </form></td>";
 
         echo '</tr>';

@@ -73,7 +73,7 @@ else
 
     <!-- Number input -->
     <div class="form-outline mb-4">
-    <input value = "<?php echo $montant ; ?>"required="required"type="number" name="montant"id="form6Example6" class="form-control" />
+    <input value = "<?php echo $montant ; ?>"required="required"type="number" step="0.01" name="montant"id="form6Example6" class="form-control" />
     <label class="form-label" for="form6Example6">المبلغ بالاوقية</label>
   </div>
 

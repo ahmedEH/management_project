@@ -102,7 +102,7 @@ mysqli_close($db);
       </div>
       <div class="form-outline mb-4">
       <label class="form-label" for="form6Example1"> المبلغ بالاوقية </label>
-        <input value = "<?php echo $montant; ?>"required="required"type="number" id="form6Example1" name="montant"class="form-control" />
+        <input value = "<?php echo $montant; ?>"required="required"type="number" step="0.01" id="form6Example1" name="montant"class="form-control" />
 
       </div>
 
