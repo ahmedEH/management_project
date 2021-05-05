@@ -222,14 +222,14 @@ $result1 = mysqli_query($db, $sql1);
             $montant_u1 = number_format($montant_u, 2, ',',' ');
             $qt = $row2['quantite'];
             $total = $row2['montant_unitaire * quantite'];
-            $total1 = number_format($total, 5, ',',' ') ;
+            $total1 = number_format($total, 4, ',',' ') ;
             $nom = $row2['nom'];
             $date = $row2['date'];
             echo '<tr>';
             echo '<td width="20%">'.$nom.'</td>';
             echo '<td width="20%"dir="ltr"><strong>'.$montant_u1.'</strong></td>';
             echo '<td width="20%">'.$qt.'</td>';
-            echo '<td width="20%" dir="ltr"><strong>'.$total.'</strong></td>';
+            echo '<td width="20%" dir="ltr"><strong>'.$total1.'</strong></td>';
             echo '<td width="20%"dir="ltr">'.$date.'</td>';
             echo'</tr>';
 
@@ -244,7 +244,7 @@ $result1 = mysqli_query($db, $sql1);
           $res = mysqli_fetch_assoc(mysqli_query($db,$req));
           $in = $res['sum(montant_unitaire * quantite)'];
           $montant = $in - 0;
-          //$montant = number_format($montant, 2, ',', ' ');
+          $montant = number_format($montant, 4, ',', ' ');
           echo $montant ;
 
         echo '</span>
@@ -264,7 +264,7 @@ $result1 = mysqli_query($db, $sql1);
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $in = $res['sum(montant_unitaire * quantite)'];
         $montant = $in - 0;
-        $montant = number_format($montant, 2, ',', ' ');
+        $montant = number_format($montant, 4, ',', ' ');
         echo $montant ;
         ?>
       </span>
@@ -307,14 +307,14 @@ $result1 = mysqli_query($db, $sql1);
             $montant_u1 = number_format($montant_u, 2, ',',' ');
             $qt = $row2['quantite'];
             $total = $row2['montant_unitaire * quantite'];
-            $total1 = number_format($total, 5, ',',' ') ;
+            $total1 = number_format($total, 4, ',',' ') ;
             $nom = $row2['nom'];
             $date = $row2['date'];
             echo '<tr>';
             echo '<td width="20%">'.$nom.'</td>';
             echo '<td width="20%"dir="ltr"><strong>'.$montant_u1.'</strong></td>';
             echo '<td width="20%">'.$qt.'</td>';
-            echo '<td width="20%" dir="ltr"><strong>'.$total.'</strong></td>';
+            echo '<td width="20%" dir="ltr"><strong>'.$total1.'</strong></td>';
             echo '<td width="20%"dir="ltr">'.$date.'</td>';
             echo'</tr>';
 
@@ -329,7 +329,7 @@ $result1 = mysqli_query($db, $sql1);
           $res = mysqli_fetch_assoc(mysqli_query($db,$req));
           $in = $res['sum(montant_unitaire * quantite)'];
           $montant = $in - 0;
-          //$montant = number_format($montant, 2, ',', ' ');
+          $montant = number_format($montant, 4, ',', ' ');
           echo $montant ;
 
         echo '</span>
@@ -349,7 +349,7 @@ $result1 = mysqli_query($db, $sql1);
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $in = $res['sum(montant_unitaire * quantite)'];
         $montant = $in - 0;
-        $montant = number_format($montant, 2, ',', ' ');
+        $montant = number_format($montant, 4, ',', ' ');
         echo $montant ;
         ?>
       </span>
