@@ -1,4 +1,8 @@
 <?php
+
+//select * from depenses where projet in (select id from projets where client = 9);
+//select * from ouvriers_projets where projet in (select id from projets where client = 5);
+
 session_start();
 
 include('db_conn.php');
@@ -24,11 +28,20 @@ else
 
 $date_1 = '2021-01-01';
 $date_2 = date('Y-m-d');
+$client_selected = -1;
 
 if(isset($_POST['date_submit']))
 {
     $date_1 = $_POST['date_1'];
     $date_2 = $_POST['date_2'];
+    $client_selected = $_POST['client_selected'];
+
+}
+elseif(isset($_POST['date_submit1']))
+{
+  $date_1 = $_POST['date_1'];
+    $date_2 = $_POST['date_2'];
+    $client_selected = -1;
 }
 
 $date_time_1 = $date_1.' 00:00:00';
@@ -110,9 +123,47 @@ $date_time_2 = $date_2.' 23:59:59';
         
 
 
-            إلى :&nbsp;&nbsp;<input value = "<?php echo $date_2; ?>"name = "date_2" style="display: inline;"type="date" class="form-control" >  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            إلى :&nbsp;&nbsp;<input value = "<?php echo $date_2; ?>"name = "date_2" style="display: inline;"type="date" class="form-control" >  &nbsp;&nbsp;&nbsp;&nbsp;
 
         
+            الزبون :&nbsp;&nbsp;
+            
+            <select id="form6Example1"name="client_selected"class="form-control" aria-label="Default select example">
+
+            <?php
+            $fonction = "زبون";
+            $sql = "SELECT * from personnes where fonction = '$fonction'";
+            $result = mysqli_query($db, $sql);
+            if (mysqli_num_rows($result) > 0) 
+            {
+              if($client_selected == -1)
+              {
+                echo "<option value=\"-1\" selected>الكل</option>"; 
+              }
+              else{
+                echo "<option value=\"-1\">الكل</option>"; 
+              }
+              while($row = mysqli_fetch_assoc($result)) 
+              {
+                $id = $row['id'];
+                
+                if($client_selected == $id)
+                {
+                  echo "<option value=\"$id\" selected>" .$row['nom_prenom']." | ".$row['tel']."</option>";
+                }
+                else{
+
+                echo "<option value=\"$id\">" .$row['nom_prenom']." | ".$row['tel']."</option>";
+                }
+                
+              }
+            }
+
+            ?>
+            </select>
+            
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 
             <button name = "date_submit"type="submit" class="btn btn-primary">كشف</button>
         
@@ -129,7 +180,7 @@ $date_time_2 = $date_2.' 23:59:59';
 
 
 
-            <button name = "date_submit"type="submit" class="mx-3 btn btn-primary"> كشف الكل</button>
+            <button name = "date_submit1"type="submit" class="mx-3 btn btn-primary"> كشف الكل</button>
 
 </form>
 </div>
@@ -140,40 +191,46 @@ $date_time_2 = $date_2.' 23:59:59';
 
     <?php
 
-$sql = "SELECT distinct projet from depenses where fournisseur = '$fournisseur'  ORDER BY id desc";
-$result = mysqli_query($db, $sql);
+    if($client_selected == -1)
+    {
+$sql1 = "SELECT distinct projet from depenses where fournisseur = '$fournisseur'  ORDER BY id desc";
+$result1 = mysqli_query($db, $sql1);
 
     // output data of each row
-    while($row = mysqli_fetch_assoc($result)) {
+    while($row = mysqli_fetch_assoc($result1)) {
         $projet = $row['projet'];
         $sql1 = "SELECT nom from projets where id = '$projet'";
         $nom = mysqli_fetch_assoc(mysqli_query($db,$sql1))['nom'];
 
         echo '<h5 class="bg-default p-3" style="width:auto">اسم المشروع :'.$nom.'</h5>';
-        $sql2 = "SELECT  * from depenses where fournisseur = '$fournisseur'  and projet = '$projet' and date between '$date_time_1' and '$date_time_2' ORDER BY id desc";
+        $sql2 = "SELECT  *, montant_unitaire * quantite from depenses where fournisseur = '$fournisseur'  and projet = '$projet' and date between '$date_time_1' and '$date_time_2' ORDER BY id desc";
         $result2 = mysqli_query($db,$sql2);
         echo '<table class="table">
         <thead class="thead-dark">
           <tr>
-            <th width="25%">اسم المصروف</th>
-            <th width="25%">مبلغ الوحدة</th>
-            <th width="25%"> الكمية</th>
-            <th width="25%"> التاريخ</th>
+            <th width="20%">اسم المصروف</th>
+            <th width="20%">مبلغ الوحدة</th>
+            <th width="20%"> الكمية</th>
+            <th width="20%"> الحاصل</th>
+            <th width="20%"> التاريخ</th>
           </tr>
         </thead>
     
       <tbody>';
         while($row2 = mysqli_fetch_assoc($result2)){
             $montant_u = $row2['montant_unitaire'];
-            $montant_u = number_format($montant_u, 2, ',', ' ');
+            $montant_u1 = number_format($montant_u, 2, ',',' ');
             $qt = $row2['quantite'];
+            $total = $row2['montant_unitaire * quantite'];
+            $total1 = number_format($total, 5, ',',' ') ;
             $nom = $row2['nom'];
             $date = $row2['date'];
             echo '<tr>';
-            echo '<td width="25%">'.$nom.'</td>';
-            echo '<td width="25%"dir="ltr"><strong>'.$montant_u.'</strong></td>';
-            echo '<td width="25%">'.$qt.'</td>';
-            echo '<td width="25%"dir="ltr">'.$date.'</td>';
+            echo '<td width="20%">'.$nom.'</td>';
+            echo '<td width="20%"dir="ltr"><strong>'.$montant_u1.'</strong></td>';
+            echo '<td width="20%">'.$qt.'</td>';
+            echo '<td width="20%" dir="ltr"><strong>'.$total.'</strong></td>';
+            echo '<td width="20%"dir="ltr">'.$date.'</td>';
             echo'</tr>';
 
 
@@ -187,7 +244,7 @@ $result = mysqli_query($db, $sql);
           $res = mysqli_fetch_assoc(mysqli_query($db,$req));
           $in = $res['sum(montant_unitaire * quantite)'];
           $montant = $in - 0;
-          $montant = number_format($montant, 2, ',', ' ');
+          //$montant = number_format($montant, 2, ',', ' ');
           echo $montant ;
 
         echo '</span>
@@ -197,12 +254,8 @@ $result = mysqli_query($db, $sql);
 
 
     }
-
-
-
-?>
-
-  <br/><br/><br/><br/><br/>
+    ?>
+      <br/><br/><br/><br/><br/>
 <div class="justify-content-center"style = "float:left">
 
       <span style="float:right;"> المجموع  الكلي : </span><span  style = "float:left"dir ="ltr"class="badge   ">
@@ -219,6 +272,97 @@ $result = mysqli_query($db, $sql);
     <br/><br/>
     </div>
 </div>
+<?php
+
+
+  }
+  else{
+
+    $sql1 = "SELECT distinct projet from depenses where fournisseur = '$fournisseur'  and projet in (select id from projets where client = '$client_selected') ORDER BY id desc";
+$result1 = mysqli_query($db, $sql1);
+
+    // output data of each row
+    while($row = mysqli_fetch_assoc($result1)) {
+        $projet = $row['projet'];
+        $sql1 = "SELECT nom from projets where id = '$projet'";
+        $nom = mysqli_fetch_assoc(mysqli_query($db,$sql1))['nom'];
+
+        echo '<h5 class="bg-default p-3" style="width:auto">اسم المشروع :'.$nom.'</h5>';
+        $sql2 = "SELECT  *, montant_unitaire * quantite from depenses where fournisseur = '$fournisseur'  and projet = '$projet' and date between '$date_time_1' and '$date_time_2' ORDER BY id desc";
+        $result2 = mysqli_query($db,$sql2);
+        echo '<table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th width="20%">اسم المصروف</th>
+            <th width="20%">مبلغ الوحدة</th>
+            <th width="20%"> الكمية</th>
+            <th width="20%"> الحاصل</th>
+            <th width="20%"> التاريخ</th>
+          </tr>
+        </thead>
+    
+      <tbody>';
+        while($row2 = mysqli_fetch_assoc($result2)){
+            $montant_u = $row2['montant_unitaire'];
+            $montant_u1 = number_format($montant_u, 2, ',',' ');
+            $qt = $row2['quantite'];
+            $total = $row2['montant_unitaire * quantite'];
+            $total1 = number_format($total, 5, ',',' ') ;
+            $nom = $row2['nom'];
+            $date = $row2['date'];
+            echo '<tr>';
+            echo '<td width="20%">'.$nom.'</td>';
+            echo '<td width="20%"dir="ltr"><strong>'.$montant_u1.'</strong></td>';
+            echo '<td width="20%">'.$qt.'</td>';
+            echo '<td width="20%" dir="ltr"><strong>'.$total.'</strong></td>';
+            echo '<td width="20%"dir="ltr">'.$date.'</td>';
+            echo'</tr>';
+
+
+        }
+        echo '</tbody></table>';
+        echo '<div class="justify-content-center "style = "float:left">
+
+        <span style="float:right;"> المجموع   : </span><span  style = "float:left"dir ="ltr"class="badge   ">';
+
+          $req = "select sum(montant_unitaire * quantite) from depenses where fournisseur ='$fournisseur' and projet = '$projet'";
+          $res = mysqli_fetch_assoc(mysqli_query($db,$req));
+          $in = $res['sum(montant_unitaire * quantite)'];
+          $montant = $in - 0;
+          //$montant = number_format($montant, 2, ',', ' ');
+          echo $montant ;
+
+        echo '</span>
+  
+        
+      </div>';
+
+
+    }
+    ?>
+      <br/><br/><br/><br/><br/>
+<div class="justify-content-center"style = "float:left">
+
+      <span style="float:right;"> المجموع  الكلي : </span><span  style = "float:left"dir ="ltr"class="badge   ">
+        <?php
+        $req = "select sum(montant_unitaire * quantite) from depenses where fournisseur ='$fournisseur' and projet in (select id from projets where client = '$client_selected')";
+        $res = mysqli_fetch_assoc(mysqli_query($db,$req));
+        $in = $res['sum(montant_unitaire * quantite)'];
+        $montant = $in - 0;
+        $montant = number_format($montant, 2, ',', ' ');
+        echo $montant ;
+        ?>
+      </span>
+
+    <br/><br/>
+    </div>
+</div>
+<?php
+
+  }
+?>
+
+
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <div style="padding:30px 30px"class="jumbotron jumbotron-fluid">
 

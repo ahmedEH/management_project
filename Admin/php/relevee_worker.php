@@ -24,13 +24,21 @@ else
 
 $date_1 = '2021-01-01';
 $date_2 = date('Y-m-d');
+$client_selected = -1;
 
 if(isset($_POST['date_submit']))
 {
     $date_1 = $_POST['date_1'];
     $date_2 = $_POST['date_2'];
-}
+    $client_selected = $_POST['client_selected'];
 
+}
+elseif(isset($_POST['date_submit1']))
+{
+  $date_1 = $_POST['date_1'];
+    $date_2 = $_POST['date_2'];
+    $client_selected = -1;
+}
 $date_time_1 = $date_1.' 00:00:00';
 $date_time_2 = $date_2.' 23:59:59';
 
@@ -102,34 +110,72 @@ $date_time_2 = $date_2.' 23:59:59';
 <h1 style="text-align:center"> كشف عمليات </h1>
 <br/><br/>
 <div class="container-fluid date-submit d-flex justify-content-center">
-    <form style=""class="form-inline " action="relevee_worker.php"method="post">
+<form style=""class="form-inline " action="relevee_worker.php"method="post">
 
 
             
-             من :&nbsp;&nbsp;<input value = "<?php echo $date_1; ?>"name = "date_1" style="display: inline;"type="date" class="form-control" >&nbsp;&nbsp;&nbsp;&nbsp;
-        
-
-
-            إلى :&nbsp;&nbsp;<input value = "<?php echo $date_2; ?>"name = "date_2" style="display: inline;"type="date" class="form-control" >  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-        
-
-            <button name = "date_submit"type="submit" class="btn btn-primary">كشف</button>
-        
-    </form>
-    <form style=""class="form-inline " action="relevee_worker.php"method="post">
-
-
-            
-            <input value = "2021-01-01"name = "date_1" style="display: inline;"type="date" class="form-control" hidden>
+من :&nbsp;&nbsp;<input value = "<?php echo $date_1; ?>"name = "date_1" style="display: inline;"type="date" class="form-control" >&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 
-            <input value = "<?php echo date('Y-m-d'); ?>"name = "date_2" style="display: inline;"type="date" class="form-control" hidden>  
+إلى :&nbsp;&nbsp;<input value = "<?php echo $date_2; ?>"name = "date_2" style="display: inline;"type="date" class="form-control" >  &nbsp;&nbsp;&nbsp;&nbsp;
+
+
+الزبون :&nbsp;&nbsp;
+
+<select id="form6Example1"name="client_selected"class="form-control" aria-label="Default select example">
+
+<?php
+$fonction = "زبون";
+$sql = "SELECT * from personnes where fonction = '$fonction'";
+$result = mysqli_query($db, $sql);
+if (mysqli_num_rows($result) > 0) 
+{
+ if($client_selected == -1)
+ {
+   echo "<option value=\"-1\" selected>الكل</option>"; 
+ }
+ else{
+   echo "<option value=\"-1\">الكل</option>"; 
+ }
+ while($row = mysqli_fetch_assoc($result)) 
+ {
+   $id = $row['id'];
+   
+   if($client_selected == $id)
+   {
+     echo "<option value=\"$id\" selected>" .$row['nom_prenom']." | ".$row['tel']."</option>";
+   }
+   else{
+
+   echo "<option value=\"$id\">" .$row['nom_prenom']." | ".$row['tel']."</option>";
+   }
+   
+ }
+}
+
+?>
+</select>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+<button name = "date_submit"type="submit" class="btn btn-primary">كشف</button>
+
+</form>
+<form style=""class="form-inline " action="relevee_worker.php"method="post">
 
 
 
-            <button name = "date_submit"type="submit" class="mx-3 btn btn-primary"> كشف الكل</button>
+<input value = "2021-01-01"name = "date_1" style="display: inline;"type="date" class="form-control" hidden>
+
+
+
+<input value = "<?php echo date('Y-m-d'); ?>"name = "date_2" style="display: inline;"type="date" class="form-control" hidden>  
+
+
+
+<button name = "date_submit1"type="submit" class="mx-3 btn btn-primary"> كشف الكل</button>
 
 </form>
 </div>
@@ -139,8 +185,9 @@ $date_time_2 = $date_2.' 23:59:59';
 
 
     <?php
-
-$sql = "SELECT distinct projet from ouvriers_projets where ouvrier = '$worker'  ORDER BY id desc";
+if($client_selected == -1)
+{
+$sql = "SELECT distinct projet from ouvriers_projets where ouvrier = '$worker' ORDER BY id desc";
 $result = mysqli_query($db, $sql);
 
     // output data of each row
@@ -190,17 +237,85 @@ $result = mysqli_query($db, $sql);
 
 
     }
+    ?>
+    <br/><br/><br/><br/><br/>
+<div class="justify-content-center"style = "float:left">
+
+    <span style="float:right;"> المجموع  الكلي : </span><span  style = "float:left"dir ="ltr"class="badge   ">
+      <?php
+      $req = "select sum(montant) from ouvriers_projets where ouvrier ='$worker'";
+      $res = mysqli_fetch_assoc(mysqli_query($db,$req));
+      $in = $res['sum(montant)'];
+      $montant = $in - 0;
+      $montant = number_format($montant, 2, ',', ' ');
+      echo $montant ;
+      ?>
+    </span>
+
+  <br/><br/>
+  </div>
+</div>
+<?php
+
+  }
+  else{
+    $sql = "SELECT distinct projet from ouvriers_projets where ouvrier = '$worker' and projet in (select id from projets where client = '$client_selected') ORDER BY id desc";
+$result = mysqli_query($db, $sql);
+
+    // output data of each row
+    while($row = mysqli_fetch_assoc($result)) {
+        $projet = $row['projet'];
+        $sql1 = "SELECT nom from projets where id = '$projet'";
+        $nom = mysqli_fetch_assoc(mysqli_query($db,$sql1))['nom'];
+
+        echo '<h5 class="bg-default p-3" style="width:auto">اسم المشروع :'.$nom.'</h5>';
+        $sql2 = "SELECT  * from ouvriers_projets where ouvrier = '$worker'  and projet = '$projet' and date between '$date_time_1' and '$date_time_2' ORDER BY id desc";
+        $result2 = mysqli_query($db,$sql2);
+        echo '<table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th width="50%">المبلغ</th>
+            <th width="50%">التاريخ</th>
+          </tr>
+        </thead>
+    
+      <tbody>';
+        while($row2 = mysqli_fetch_assoc($result2)){
+            $montant = $row2['montant'];
+            $montant = number_format($montant, 2, ',', ' ');
+            echo '<tr>';
+            echo '<td width="50%"dir="ltr"><strong>'.$montant.'</strong></td>';
+            echo '<td width="50%"dir="ltr">'.$row2['date'].'</td>';
+            echo'</tr>';
 
 
+        }
+        echo '</tbody></table>';
+        echo '<div class="justify-content-center"style = " width : 400px;float:left">
 
-?>
+        <span style="float:right;"> المجموع   : </span><span  style = "float:left"dir ="ltr"class="badge   ">';
 
-  <br/><br/><br/><br/><br/>
+          $req = "select sum(montant) from ouvriers_projets where ouvrier ='$worker' and projet = '$projet'";
+          $res = mysqli_fetch_assoc(mysqli_query($db,$req));
+          $in = $res['sum(montant)'];
+          $montant = $in - 0;
+          $montant = number_format($montant, 2, ',', ' ');
+          echo $montant ;
+
+        echo '</span>
+  
+      <br/><br/>
+      </div>';
+
+
+    }
+    ?>
+      <br/><br/><br/><br/><br/>
 <div class="justify-content-center"style = "float:left">
 
       <span style="float:right;"> المجموع  الكلي : </span><span  style = "float:left"dir ="ltr"class="badge   ">
         <?php
-        $req = "select sum(montant) from ouvriers_projets where ouvrier ='$worker'";
+        $req = "select sum(montant) from ouvriers_projets where ouvrier ='$worker' and projet in (select id from projets where client = '$client_selected')";
         $res = mysqli_fetch_assoc(mysqli_query($db,$req));
         $in = $res['sum(montant)'];
         $montant = $in - 0;
@@ -212,6 +327,12 @@ $result = mysqli_query($db, $sql);
     <br/><br/>
     </div>
 </div>
+<?php
+  }
+
+?>
+
+
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <div style="padding:30px 30px"class="jumbotron jumbotron-fluid">
 

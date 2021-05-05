@@ -25,7 +25,7 @@ $mail->setFrom('consulting.ci.contact@gmail.com', 'cheikh brahim');
  
 // Add a recipient 
 
-$mail->addAddress('ahmedken111@gmail.com'); 
+$mail->addAddress('mrabottc@gmail.com'); 
 
 
  
